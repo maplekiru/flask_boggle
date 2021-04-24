@@ -32,16 +32,19 @@ def new_game():
 
 @app.route('/api/score-word', methods=['POST'])
 def score_word():
-    """check if the word is legal"""
-    game = games[session['game_id']]
+    """check if the word is legal""" #add more
+    game_id = request.json['game_id']
+    print("This is the", game_id)
+    word = request.json['word'].upper()
+    print("THIS IS GAMES", games)
 
-    word = request.form['word']
-    
+    game = games[game_id]
+
     print('word: ', word)
     if not game.is_word_in_word_list(word):
-        return jsonify({result: 'not-word'})
+        return jsonify({'result': 'not-word'})
     if not game.check_word_on_board(word):
-        return jsonify({result: "not-on-board"})
+        return jsonify({'result': "not-on-board"})
     else:
-        return jsonify({result: 'ok'})
+        return jsonify({'result': 'ok'})
 

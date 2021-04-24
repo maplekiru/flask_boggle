@@ -47,4 +47,37 @@ class BoggleAppTestCase(TestCase):
             self.assertIsInstance(new_game_data['board'], list)
 
 
-        
+    def test_score_word(self):
+        """Test starting a new game."""
+
+        with self.client as client:
+            response = client.get('/api/new-game')
+            # breakpoint()
+            # {"gameId": "need-real-id", "board": "need-real-board"}
+            new_game_data = response.get_json()
+            print('new_game_data:', new_game_data)
+            uniqueId = new_game_data['gameId']
+
+            game = games[uniqueId]
+            game.board = [["C","A","T"],["A","V","T"],["A","B","E"]]
+            game.board_size = 3
+            # print('result', game.board, games)
+
+            resp = client.post('/api/score-word',
+                json={'word': 'CAT', 'game_id': uniqueId})
+            result = resp.get_json()
+            print('result:', result['result'])
+            self.assertEqual(result['result'],'ok')
+
+            resp = client.post('/api/score-word',
+                json={'word': 'ABC', 'game_id': uniqueId})
+            result = resp.get_json()
+            print('result:', result['result'])
+            self.assertEqual(result['result'],'not-word')
+
+            resp = client.post('/api/score-word',
+                json={'word': 'TAB', 'game_id': uniqueId})
+            result = resp.get_json()
+            print('result:', result['result'])
+            self.assertEqual(result['result'],'not-on-board')
+            
